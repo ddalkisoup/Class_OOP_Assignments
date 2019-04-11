@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <iomanip>
 using namespace std;
 
 int* strSplit(string);
@@ -16,40 +17,52 @@ int main()
 	char _totalNumber;
 	inFile.get(_totalNumber);
 	int totalNumber = (int)_totalNumber - 48;
-	
+	inFile.get();	//Skip '\n' of the first line
 
 	//for totalnumber, get lines
 	//
 	int *scores;
 	int studentNumber;
 	int sum = 0;
-
+	int belowAvgCount;
+	double average;
+	double belowAvgPercent;
+	int classNumber = 0;
 	string classInfo;
+
 	for (int i = 0; i < totalNumber; ++i)
 	{
 		getline(inFile, classInfo);
 		scores = strSplit(classInfo);	//split string to int array? list?
 		studentNumber = scores[0];
 		sum = 0;
+		average = 0;
+		belowAvgCount = 0;
+		belowAvgPercent = 0;
 
 		// sum components and get average
 		for (int i = 0; i < studentNumber; ++i)
 		{
 			sum += scores[i + 1];
 		}
-
+		average = (double)sum / studentNumber;
 
 		// get percentage below average
+		for (int i = 0; i < studentNumber; ++i)
+		{
+			if (scores[i + 1] < average)
+				belowAvgCount++;
+		}
 
+		belowAvgPercent = (double)belowAvgCount / studentNumber * 100;
+		classNumber++;
+
+		// #CN xx.xxx%
+		cout << "#" << classNumber << " "
+			<< fixed << setprecision(3)
+			<< belowAvgPercent 
+			<< "%" << endl;
 	}
-
-	//test
-	/*string testString = "500 50 50 70 80 100";
-	int *scores = strSplit(testString);
-	for (int i = 0; i < 6; ++i)
-	{
-		cout << scores[i] << " ";
-	}*/
 
 
 	return 0;
