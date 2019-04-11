@@ -14,55 +14,106 @@ int main()
 	inFile.open("input.txt");
 	//Get first line of classes
 	//and convert to int
-	char _totalNumber;
-	inFile.get(_totalNumber);
-	int totalNumber = (int)_totalNumber - 48;
-	inFile.get();	//Skip '\n' of the first line
+	string _totalNumber;
+	getline(inFile, _totalNumber);
+	int totalNumber = stoi(_totalNumber);
+
+	if (totalNumber == 0)
+		return 0;
+
+	//Exception 1
+	if (totalNumber > 1000 || totalNumber < 0)
+	{
+		cout << "error_code_1";
+		return -1;
+	}
 
 	//for totalnumber, get lines
-	//
 	int *scores;
 	int studentNumber;
 	int sum = 0;
 	int belowAvgCount;
-	double average;
-	double belowAvgPercent;
 	int classNumber = 0;
 	string classInfo;
+
+	//Exception 2
+	int getLineCount = 0;
+	string testString;
+	while (true)
+	{
+		getline(inFile, testString);
+		if (!inFile.fail())
+			getLineCount++;
+		else
+			break;
+	}
+	if (getLineCount != totalNumber)
+	{
+		cout << "error_coed_2";
+		return -1;
+	}
+
+	inFile.clear();
+	inFile.seekg(0L, ios::beg);	//move cursor to begining	
+	getline(inFile, testString);    //move cursor to 2nd line
+	testString.clear();
+
+	ofstream outFile;
+	outFile.open("output.txt");
 
 	for (int i = 0; i < totalNumber; ++i)
 	{
 		getline(inFile, classInfo);
-		scores = strSplit(classInfo);	//split string to int array? list?
+		scores = strSplit(classInfo);	//split string to int array[102]
 		studentNumber = scores[0];
+
+		//Exception 3
+		if (studentNumber > 100 || studentNumber <= 0)
+		{
+			cout << "error_code_3";
+			return -1;
+		}
+
+		//Exception 4
+		if (scores[102] != studentNumber)
+		{
+			cout << "error_code_4";
+			return -1;
+		}
+
 		sum = 0;
-		average = 0;
 		belowAvgCount = 0;
-		belowAvgPercent = 0;
 
 		// sum components and get average
 		for (int i = 0; i < studentNumber; ++i)
 		{
+			//Exception 5
+			if (scores[i + 1] < 0 || scores[i + 1] > 100)
+			{
+				cout << "error_code_5";
+				return -1;
+			}
+			
 			sum += scores[i + 1];
 		}
-		average = (double)sum / studentNumber;
 
 		// get percentage below average
 		for (int i = 0; i < studentNumber; ++i)
 		{
-			if (scores[i + 1] < average)
+			if (scores[i + 1] < (double)sum / studentNumber)	//average
 				belowAvgCount++;
 		}
-
-		belowAvgPercent = (double)belowAvgCount / studentNumber * 100;
 		classNumber++;
 
 		// #CN xx.xxx%
-		cout << "#" << classNumber << " "
+		outFile << "#" << classNumber << " "
 			<< fixed << setprecision(3)
-			<< belowAvgPercent 
+			<< (double)belowAvgCount / studentNumber * 100    //below average percent
 			<< "%" << endl;
 	}
+
+	inFile.close();
+	outFile.close();
 
 
 	return 0;
@@ -73,11 +124,13 @@ int main()
 //text.substr(start, end): string slice 
 int* strSplit(string str)
 {
-	static int Scores[100]; // ***Need to optimzie. Use list?***
+	static int Scores[102]; // ***Need to optimzie. Use list?***
+	                        // Scores[102]: number of scores
 
 	char ch;
 	int strIndex = 0;
 	int scoreIndex = 0;
+	int scoreCount = 0;    //for exception 4
 	string num = "";
 
 	for (int i = 0; i < str.length() + 1; i++)
@@ -88,6 +141,7 @@ int* strSplit(string str)
 			Scores[scoreIndex++] = stoi(num);
 			num = "";
 			strIndex++;
+			scoreCount++;
 			continue;
 		}
 		else
@@ -96,6 +150,7 @@ int* strSplit(string str)
 			strIndex++;
 		}
 	}
+	Scores[102] = scoreCount - 1;    //except student number
 
 	return Scores;
 }
