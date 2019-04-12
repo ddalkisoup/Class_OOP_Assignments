@@ -50,7 +50,7 @@ int main()
 	}
 	if (getLineCount != totalNumber)
 	{
-		cout << "error_coed_2";
+		cout << "error_code_2";
 		return -1;
 	}
 
