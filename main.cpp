@@ -14,6 +14,9 @@ int main()
 	ifstream inFile;
 	inFile.open("input.txt");
 
+	ofstream outFile;
+	outFile.open("output.txt");
+
 	string _totalNumber;
 	getline(inFile, _totalNumber);
 	int totalNumber = stoi(_totalNumber);
@@ -58,9 +61,6 @@ int main()
 	inFile.seekg(0L, ios::beg);	//move cursor to begining	
 	getline(inFile, testString);    //move cursor to 2nd line
 	testString.clear();
-
-	ofstream outFile;
-	outFile.open("output.txt");
 
 	for (int i = 0; i < totalNumber; ++i)
 	{
@@ -113,7 +113,6 @@ int main()
 
 	inFile.close();
 	outFile.close();
-
 
 	return 0;
 }
