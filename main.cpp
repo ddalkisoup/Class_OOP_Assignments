@@ -6,17 +6,18 @@
 #include <iomanip>
 using namespace std;
 
-int* strSplit(string);
+int* strSplit(string, int*);
+int getAvg(int*, int);
 
 int main()
 {
 	ifstream inFile;
 	inFile.open("input.txt");
-	//Get first line of classes
-	//and convert to int
+
 	string _totalNumber;
 	getline(inFile, _totalNumber);
 	int totalNumber = stoi(_totalNumber);
+	_totalNumber.clear();
 
 	if (totalNumber == 0)
 		return 0;
@@ -28,12 +29,12 @@ int main()
 		return -1;
 	}
 
-	//for totalnumber, get lines
 	int *scores;
 	int studentNumber;
-	int sum = 0;
+	int average = 0;
 	int belowAvgCount;
 	int classNumber = 0;
+	int scoreCount = 0;
 	string classInfo;
 
 	//Exception 2
@@ -63,8 +64,12 @@ int main()
 
 	for (int i = 0; i < totalNumber; ++i)
 	{
+		average = 0;
+		belowAvgCount = 0;
+		scoreCount = 0;
+
 		getline(inFile, classInfo);
-		scores = strSplit(classInfo);	//split string to int array[102]
+		scores = strSplit(classInfo, &scoreCount);	//split string to int array[102]
 		studentNumber = scores[0];
 
 		//Exception 3
@@ -75,32 +80,26 @@ int main()
 		}
 
 		//Exception 4
-		if (scores[102] != studentNumber)
+		if (scoreCount != studentNumber)
 		{
 			cout << "error_code_4";
 			return -1;
 		}
 
-		sum = 0;
-		belowAvgCount = 0;
-
 		// sum components and get average
-		for (int i = 0; i < studentNumber; ++i)
+		average = getAvg(scores, studentNumber);
+		//Exception 5
+		if (average == -1)
 		{
-			//Exception 5
-			if (scores[i + 1] < 0 || scores[i + 1] > 100)
-			{
-				cout << "error_code_5";
-				return -1;
-			}
-			
-			sum += scores[i + 1];
+			cout << "error_code_5";
+			return -1;
 		}
+
 
 		// get percentage below average
 		for (int i = 0; i < studentNumber; ++i)
 		{
-			if (scores[i + 1] < (double)sum / studentNumber)	//average
+			if (scores[i + 1] < average)
 				belowAvgCount++;
 		}
 		classNumber++;
@@ -121,16 +120,13 @@ int main()
 
 
 //Split strings with scores
-//text.substr(start, end): string slice 
-int* strSplit(string str)
+int* strSplit(string str, int *ScoreCount)
 {
-	static int Scores[102]; // ***Need to optimzie. Use list?***
-	                        // Scores[102]: number of scores
+	static int Scores[101]; // ***Need to optimzie. Use list?***
 
 	char ch;
 	int strIndex = 0;
 	int scoreIndex = 0;
-	int scoreCount = 0;    //for exception 4
 	string num = "";
 
 	for (int i = 0; i < str.length() + 1; i++)
@@ -141,7 +137,7 @@ int* strSplit(string str)
 			Scores[scoreIndex++] = stoi(num);
 			num = "";
 			strIndex++;
-			scoreCount++;
+			ScoreCount[0]++;
 			continue;
 		}
 		else
@@ -150,7 +146,26 @@ int* strSplit(string str)
 			strIndex++;
 		}
 	}
-	Scores[102] = scoreCount - 1;    //except student number
+	ScoreCount[0] -= 1;	//except student number
 
 	return Scores;
+}
+
+
+//get score average and return -1 if exception5
+int getAvg(int Scores[], int StudentNumber)
+{
+	int sum = 0;
+	for (int i = 0; i < StudentNumber; ++i)
+	{
+		//Exception 5
+		if (Scores[i + 1] < 0 || Scores[i + 1] > 100)
+		{
+			return -1;
+		}
+
+		sum += Scores[i + 1];
+	}
+
+	return (double)sum / StudentNumber;
 }
