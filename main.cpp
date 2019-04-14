@@ -8,11 +8,12 @@ using namespace std;
 
 int* strSplit(string, int*);
 int getAvg(int*, int);
+void printException(ofstream&, int, string, int, int);
 
 int main()
 {
 	ifstream inFile;
-	inFile.open("input.txt");
+	inFile.open("test1.txt");
 
 	ofstream outFile;
 	outFile.open("output.txt");
@@ -28,8 +29,9 @@ int main()
 	//Exception 1
 	if (totalNumber > 1000 || totalNumber < 0)
 	{
-		cout << "error_code_1";
-		return -1;
+		outFile << "error_code_1";
+		inFile.close(); outFile.close();
+		return 0;	//exit
 	}
 
 	int *scores;
@@ -53,8 +55,9 @@ int main()
 	}
 	if (getLineCount != totalNumber)
 	{
-		cout << "error_code_2";
-		return -1;
+		outFile << "error_code_2";
+		inFile.close(); outFile.close();
+		return 0;	//exit
 	}
 
 	inFile.clear();
@@ -63,7 +66,7 @@ int main()
 	testString.clear();
 
 	for (int i = 0; i < totalNumber; ++i)
-	{
+	{		
 		average = 0;
 		belowAvgCount = 0;
 		scoreCount = 0;
@@ -75,15 +78,15 @@ int main()
 		//Exception 3
 		if (studentNumber > 100 || studentNumber <= 0)
 		{
-			cout << "error_code_3";
-			return -1;
+			printException(outFile, ++classNumber, "error_code_3", i, totalNumber);
+			continue;
 		}
 
 		//Exception 4
 		if (scoreCount != studentNumber)
 		{
-			cout << "error_code_4";
-			return -1;
+			printException(outFile, ++classNumber, "error_code_4", i, totalNumber);
+			continue;
 		}
 
 		// sum components and get average
@@ -91,8 +94,8 @@ int main()
 		//Exception 5
 		if (average == -1)
 		{
-			cout << "error_code_5";
-			return -1;
+			printException(outFile, ++classNumber, "error_code_5", i, totalNumber);
+			continue;
 		}
 
 
@@ -108,7 +111,9 @@ int main()
 		outFile << "#" << classNumber << " "
 			<< fixed << setprecision(3)
 			<< (double)belowAvgCount / studentNumber * 100    //below average percent
-			<< "%" << endl;
+			<< "%";
+		if (i != totalNumber - 1)
+			outFile << "\n";
 	}
 
 	inFile.close();
@@ -167,4 +172,14 @@ int getAvg(int Scores[], int StudentNumber)
 	}
 
 	return (double)sum / StudentNumber;
+}
+
+
+void printException(ofstream& OutFile, int ClassNumber, string except,
+	int index, int TotalNumber)
+{
+	OutFile << "#" << ClassNumber << " "
+		<< except;
+	if (index != TotalNumber - 1)
+		OutFile << "\n";
 }
