@@ -13,7 +13,7 @@ void printException(ofstream&, int, string, int, int);
 int main()
 {
 	ifstream inFile;
-	inFile.open("test1.txt");
+	inFile.open("input.txt");
 
 	ofstream outFile;
 	outFile.open("output.txt");
